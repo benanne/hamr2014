@@ -29,7 +29,7 @@ for f in xrange(1, N_FOLDS + 1):
         print "  %s" % clip_path
 
         clip_target_path = os.path.join(fold_target_path, os.path.basename(clip_path))
-        command = "avconv -i %s %s" % (clip_path, clip_target_path)
+        command = "avconv -loglevel quiet -y -i %s %s" % (clip_path, clip_target_path)
         print command
         os.system(command)
 
