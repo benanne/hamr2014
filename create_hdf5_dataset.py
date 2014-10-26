@@ -10,7 +10,7 @@ import librosa
 import h5py
 
 
-SOURCE_PATH = "/home/sedielem/data/urbansound8k/UrbanSound8K/audio"
+SOURCE_PATH = "/home/sedielem/data/urbansound8k/audio_normalized"
 TARGET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
 SIZE = 8732
 N_FOLDS = 10
