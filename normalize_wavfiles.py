@@ -8,10 +8,13 @@ import h5py
 
 SOURCE_PATH = "/home/sedielem/data/urbansound8k/UrbanSound8K/audio"
 TARGET_PATH = "home/sedielem/data/urbansound8k/audio_normalized"
+
+SIZE = 8732
 N_FOLDS = 10
 SAMPLERATE = 22050
 
 
+i = 0
 for f in xrange(1, N_FOLDS + 1):
     print "fold %d" % f
     fold_path = os.path.join(SOURCE_PATH, "fold%d" % f)
@@ -30,5 +33,7 @@ for f in xrange(1, N_FOLDS + 1):
         command = "sox %s -r %d -c 1 %s" % (clip_path, SAMPLERATE, clip_target_path)
         print command
         os.system(command)
+
+        i += 1
 
 print "done"
