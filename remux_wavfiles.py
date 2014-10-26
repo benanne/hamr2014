@@ -11,6 +11,7 @@ TARGET_PATH = "/home/sedielem/data/urbansound8k/audio_remuxed"
 
 SIZE = 8732
 N_FOLDS = 10
+SAMPLERATE = 22050
 
 
 i = 0
@@ -29,7 +30,7 @@ for f in xrange(1, N_FOLDS + 1):
         print "  %s" % clip_path
 
         clip_target_path = os.path.join(fold_target_path, os.path.basename(clip_path))
-        command = "avconv -loglevel quiet -y -i %s %s" % (clip_path, clip_target_path)
+        command = "avconv -loglevel quiet -y -i %s -ar %d -ac 1 %s" % (clip_path, SAMPLERATE, clip_target_path)
         print command
         os.system(command)
 
