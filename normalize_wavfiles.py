@@ -7,7 +7,7 @@ import h5py
 
 
 SOURCE_PATH = "/home/sedielem/data/urbansound8k/UrbanSound8K/audio"
-TARGET_PATH = "home/sedielem/data/urbansound8k/audio_normalized"
+TARGET_PATH = "/home/sedielem/data/urbansound8k/audio_normalized"
 
 SIZE = 8732
 N_FOLDS = 10
