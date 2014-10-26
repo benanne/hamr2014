@@ -22,8 +22,9 @@ N_MELS = 128
 C = 10000
 
 
-# spectrogram_length = (SAMPLERATE * 4 - N_FFT) / HOP_LENGTH + 1 # each clip is 4 seconds
-spectrogram_length = (SAMPLERATE * 4) / HOP_LENGTH + 1 # each clip is 4 seconds
+n_samples = SAMPLERATE * 4 # each clip is padded to 4 seconds (the maximal length)
+spectrogram_length = n_samples / HOP_LENGTH + 1
+
 
 d = h5py.File(TARGET_PATH, 'w')
 d.create_dataset("spectrograms", (SIZE, N_MELS, spectrogram_length), dtype='float32')
@@ -46,7 +47,11 @@ for f in xrange(1, N_FOLDS + 1):
         # extract spectrogram
         y, sr = librosa.core.load(clip_path, sr=SAMPLERATE, mono=True) # this randomly crashes after a few clips for some reason, ask Brian
 
-        s = librosa.feature.melspectrogram(y, sr=SAMPLERATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS)
+        y_padded = np.zeros((n_samples,), dtype='float32')
+        offset = (n_samples - y.shape[0]) // 2
+        y_padded[offset:offset + y.shape[0]] = y
+
+        s = librosa.feature.melspectrogram(y_padded, sr=SAMPLERATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS)
         s = np.log(1 + C*s) # s = librosa.logamplitude(s)
 
         # parse filename
