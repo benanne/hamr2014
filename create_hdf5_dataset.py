@@ -22,7 +22,8 @@ N_MELS = 128
 C = 10000
 
 
-spectrogram_length = (SAMPLERATE * 4 - N_FFT) / HOP_LENGTH + 1 # each clip is 4 seconds
+# spectrogram_length = (SAMPLERATE * 4 - N_FFT) / HOP_LENGTH + 1 # each clip is 4 seconds
+spectrogram_length = (SAMPLERATE * 4) / HOP_LENGTH + 1 # each clip is 4 seconds
 
 d = h5py.File(TARGET_PATH, 'w')
 d.create_dataset("spectrograms", (SIZE, N_MELS, spectrogram_length), dtype='float32')
@@ -33,7 +34,7 @@ d.create_dataset("occurrenceids", (SIZE,), dtype='int32')
 d.create_dataset("sliceids", (SIZE,), dtype='int32')
 
 i = 0
-for f in xrange(NUM_FOLDS):
+for f in xrange(1, N_FOLDS + 1):
     print "fold %d" % f
     fold_path = os.path.join(SOURCE_PATH, "fold%d" % f)
     clip_paths = glob.glob(os.path.join(fold_path, "*.wav"))
@@ -41,14 +42,16 @@ for f in xrange(NUM_FOLDS):
 
     for clip_path in clip_paths:
         print "  clip %d of %d" % (i + 1, SIZE)
+        print "  %s" % clip_path
         # extract spectrogram
-        y, sr = librosa.core.load(clip_path, sr=SAMPLERATE, mono=True)
+        y, sr = librosa.core.load(clip_path, sr=SAMPLERATE, mono=True) # this randomly crashes after a few clips for some reason, ask Brian
+
         s = librosa.feature.melspectrogram(y, sr=SAMPLERATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS)
         s = np.log(1 + C*s) # s = librosa.logamplitude(s)
 
         # parse filename
         # [fsID]-[classID]-[occurrenceID]-[sliceID].wav
-        m = re.match("(\d+)-(\d)-(\d)-(\d+)\.wav", path)
+        m = re.match("(\d+)-(\d+)-(\d+)-(\d+)\.wav", os.path.basename(clip_path))
         fsid = int(m.group(1))
         classid = int(m.group(2))
         occurrenceid = int(m.group(3))
@@ -58,9 +61,9 @@ for f in xrange(NUM_FOLDS):
         d['spectrograms'][i] = s
         d['folds'][i] = f
         d['fsids'][i] = fsid
-        d['classid'][i] = classid
-        d['occurrenceid'][i] = occurrenceid
-        d['sliceid'][i] = sliceid
+        d['classids'][i] = classid
+        d['occurrenceids'][i] = occurrenceid
+        d['sliceids'][i] = sliceid
 
         i += 1
 
