@@ -1,0 +1,5 @@
+* extract melspectrograms + create HDF5 file
+
+* spherical k-means + random forest / GBM on melspectrograms
+
+* convnet (with data augmentation)
