@@ -45,8 +45,9 @@ for f in xrange(1, N_FOLDS + 1):
         print "  clip %d of %d" % (i + 1, SIZE)
         print "  %s" % clip_path
         # extract spectrogram
-        y, sr = librosa.core.load(clip_path, sr=SAMPLERATE, mono=True) # this randomly crashes after a few clips for some reason, ask Brian
-
+        y, sr = librosa.core.load(clip_path, sr=SAMPLERATE, mono=True)
+        y = y[:n_samples] # truncate to max length of 4 seconds if necessary
+        
         y_padded = np.zeros((n_samples,), dtype='float32')
         offset = (n_samples - y.shape[0]) // 2
         y_padded[offset:offset + y.shape[0]] = y
