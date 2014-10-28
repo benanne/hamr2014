@@ -83,11 +83,9 @@ loss_eval = obj.get_loss(deterministic=True)
 
 updates_train = nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY)
 
-
 y_pred_train = T.argmax(l6.get_output(), axis=1)
-acc_train = T.eq(y_pred_train, obj.target_var)
 y_pred_eval = T.argmax(l6.get_output(deterministic=True), axis=1)
-acc_eval = T.eq(y_pred_eval, obj.target_var)
+
 
 ## compile
 
@@ -99,6 +97,9 @@ y_eval = theano.shared(labels_eval)
 
 
 index = T.lscalar("index")
+
+acc_train = T.eq(y_pred_train, y_train[index * MB_SIZE:(index + 1) * MB_SIZE])
+acc_eval = T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE])
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
