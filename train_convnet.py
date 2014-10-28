@@ -83,8 +83,11 @@ loss_eval = obj.get_loss(deterministic=True)
 
 updates_train = nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY)
 
-acc_train = T.eq(l6.get_output(), obj.target_var)
-acc_eval = T.eq(l6.get_output(deterministic=True), obj.target_var)
+
+y_pred_train = T.argmax(l6.get_output(), axis=1)
+acc_train = T.eq(y_pred_train, obj.target_var)
+y_pred_eval = T.argmax(l6.get_output(deterministic=True), axis=1)
+acc_eval = T.eq(y_pred_eval, obj.target_var)
 
 ## compile
 
