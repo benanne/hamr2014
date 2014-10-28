@@ -111,9 +111,10 @@ givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
-iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_train)
+iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
 
-pred_train = thean.function([index], y_pred_train, givens=givens_train)
+pred_train = theano.function([index], y_pred_train, givens=givens_train)
+pred_eval = theano.function([index], y_pred_eval, givens=givens_eval)
 
 ## train
 
