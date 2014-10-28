@@ -14,7 +14,7 @@ CHUNK_SIZE = 4096
 NUM_CHUNKS = 5000
 NUM_TIMESTEPS_AUG = 110
 MB_SIZE = 128
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1
@@ -105,7 +105,12 @@ givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
-iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
+# iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
+
+# TODO DEBUG
+from pylearn2.devtools.nan_guard import NanGuardMode
+mode = NanGuardMode(True, True, True)
+iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train, mode=mode)
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],

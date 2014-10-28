@@ -1,4 +1,5 @@
 * loss can be NaN, fix this
+    - learning rate is not the issue
 
 * add dropout in the dense layers once the model's ability to overfit has been established
 
