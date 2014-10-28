@@ -115,7 +115,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
 
     print "  load data onto GPU"
     X_train.set_value(chunk_data)
-    y_train.set_value(chunk_labels)
+    y_train.set_value(chunk_labels.astype(theano.config.floatX)) # can't store integers
 
     print "  train"
     losses_train = []
