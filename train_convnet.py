@@ -128,7 +128,9 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         accs_train.append(acc_train)
 
     avg_loss_train = np.mean(losses_train)
+    avg_acc_train = np.mean(accs_train)
     print "  avg training loss: %.5f" % avg_loss_train
+    print "  avg accuracy: %.3f%%" % (avg_acc_train * 100)
 
     if (k + 1) % EVALUATE_EVERY == 0:
         print "  evaluate"
@@ -140,5 +142,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
             accs_eval.append(acc_eval)
 
         avg_loss_eval = np.mean(losses_eval)
+        avg_acc_eval = np.mean(accs_eval)
         print "  avg evaluation loss: %.5f" % avg_loss_eval
+        print "  avg accuracy: %.3f%%" % (avg_acc_eval * 100)
 
