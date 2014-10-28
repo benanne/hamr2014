@@ -1,6 +1,6 @@
-* compute classification accuracy on train/test
-
 * loss can be NaN, fix this
+
+* add dropout in the dense layers once the model's ability to overfit has been established
 
 * confusion matrices?
 
