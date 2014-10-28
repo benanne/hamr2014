@@ -83,6 +83,8 @@ loss_eval = obj.get_loss(deterministic=True)
 
 updates_train = nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY)
 
+acc_train = T.eq(l6.get_output(), obj.target_var)
+acc_eval = T.eq(l6.get_output(deterministic=True), obj.target_var)
 
 ## compile
 
@@ -99,13 +101,13 @@ givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES), # TODO: need a one_hot matrix (add one_hot to nntools.utils?)
 }
-iter_train = theano.function([index], loss_train, givens=givens_train, updates=updates_train)
+iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES), # TODO: need a one_hot matrix (add one_hot to nntools.utils?)
 }
-iter_eval = theano.function([index], loss_eval, givens=givens_train)
+iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_train)
 
 
 ## train
@@ -119,9 +121,11 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
 
     print "  train"
     losses_train = []
+    accs_train = []
     for b in xrange(num_batches_train):
-        loss_train = iter_train(b)
+        loss_train, acc_train = iter_train(b)
         losses_train.append(loss_train)
+        accs_train.append(acc_train)
 
     avg_loss_train = np.mean(losses_train)
     print "  avg training loss: %.5f" % avg_loss_train
@@ -129,9 +133,11 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     if (k + 1) % EVALUATE_EVERY == 0:
         print "  evaluate"
         losses_eval = []
+        accs_eval = []
         for b in xrange(num_batches_eval):
-            loss_eval = iter_eval(b)
+            loss_eval, acc_eval = iter_eval(b)
             losses_eval.append(loss_eval)
+            accs_eval.append(acc_eval)
 
         avg_loss_eval = np.mean(losses_eval)
         print "  avg evaluation loss: %.5f" % avg_loss_eval
