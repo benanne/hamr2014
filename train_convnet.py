@@ -113,6 +113,11 @@ iter_eval = theano.function([index], loss_eval, givens=givens_train)
 for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     print "chunk %d (%d of %d)" % (k, k + 1, NUM_CHUNKS)
 
+    print "  load data onto GPU"
+    X_train.set_value(chunk_data)
+    y_train.set_value(chunk_labels)
+
+    print "  train"
     losses_train = []
     for b in xrange(num_batches_train):
         loss_train = iter_train(b)
@@ -122,7 +127,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     print "  avg training loss: %.5f" % avg_loss_train
 
     if (k + 1) % EVALUATE_EVERY == 0:
-        print "  evaluating..."
+        print "  evaluate"
         losses_eval = []
         for b in xrange(num_batches_eval):
             loss_eval = iter_valid(b)
