@@ -113,8 +113,8 @@ givens_eval = {
 }
 iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
 
-pred_train = theano.function([index], y_pred_train, givens=givens_train)
-pred_eval = theano.function([index], y_pred_eval, givens=givens_eval)
+pred_train = theano.function([index], y_pred_train, givens=givens_train, on_unused_input='ignore')
+pred_eval = theano.function([index], y_pred_eval, givens=givens_eval, on_unused_input='ignore')
 
 ## train
 
