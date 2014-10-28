@@ -71,7 +71,7 @@ l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(l4, num_units=512)
 
-l6 = nn.layers.DenseLayer(l5, num_units=10, nonlinearity=T.nnet.softmax)
+l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
@@ -103,16 +103,17 @@ acc_eval = T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE])
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES), # TODO: need a one_hot matrix (add one_hot to nntools.utils?)
+    obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES), # TODO: need a one_hot matrix (add one_hot to nntools.utils?)
+    obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_train)
 
+pred_train = thean.function([index], y_pred_train, givens=givens_train)
 
 ## train
 
