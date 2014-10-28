@@ -130,6 +130,9 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     accs_train = []
     for b in xrange(num_batches_train):
         loss_train, acc_train = iter_train(b)
+        if np.isnan(loss_train):
+            raise RuntimeError("loss_train is NaN")
+
         losses_train.append(loss_train)
         accs_train.append(acc_train)
 
@@ -144,6 +147,9 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         accs_eval = []
         for b in xrange(num_batches_eval):
             loss_eval, acc_eval = iter_eval(b)
+            if np.isnan(loss_eval):
+                raise RuntimeError("loss_eval is NaN")
+
             losses_eval.append(loss_eval)
             accs_eval.append(acc_eval)
 
