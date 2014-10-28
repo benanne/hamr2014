@@ -130,9 +130,9 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         print "  evaluate"
         losses_eval = []
         for b in xrange(num_batches_eval):
-            loss_eval = iter_valid(b)
+            loss_eval = iter_eval(b)
             losses_eval.append(loss_eval)
 
         avg_loss_eval = np.mean(losses_eval)
-        print "  avg evaluation loss: %.5f" % avg_loss_valid
+        print "  avg evaluation loss: %.5f" % avg_loss_eval
 
