@@ -43,30 +43,24 @@ labels_eval = d['classids'][idcs_eval]
 
 num_examples_eval = data_eval.shape[0]
 
+def build_chunk(data, labels, chunk_size, num_timesteps_aug):
+    chunk = np.empty((chunk_size, num_mel_components, num_timesteps_aug), dtype='float32')
+    idcs = np.random.randint(0, data.shape[0], chunk_size)
+    offset = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
+
+    for l in xrange(chunk_size):
+        chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
+
+    return chunk, labels[idcs]
+
 def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug):
     for k in xrange(num_chunks):
-        chunk = np.empty((chunk_size, num_mel_components, num_timesteps_aug), dtype='float32')
-        idcs = np.random.randint(0, num_examples_train, chunk_size)
-        offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
-        
-        for l in xrange(chunk_size):
-            chunk[l] = data_train[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
-
-        labels = labels_train[idcs]
-        yield chunk, labels
+        yield build_chunk(data_train, labels_train, chunk_size, num_timesteps_aug)
 
 train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG)
 
 # generate fixed evaluation chunk
-chunk_eval = np.empty((CHUNK_SIZE, num_mel_components, num_timesteps_aug), dtype='float32')
-idcs = np.random.randint(0, num_examples_eval, CHUNK_SIZE)
-offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, CHUNK_SIZE)
-
-for l in xrange(chunk_size):
-    chunk_eval[l] = data_eval[idcs_eval[l], :, offsets[l]:offsets[l] + NUM_TIMESTEPS_AUG]
-
-chunk_eval_labels = labels_eval[idcs]
-# chunk_eval = spectrograms[idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
+chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
