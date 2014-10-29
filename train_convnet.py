@@ -20,7 +20,7 @@ LEARNING_RATE = 0.1 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1
-SOFTMAX_LAMBDA = 0.001
+# SOFTMAX_LAMBDA = 0.01
 
 
 d = h5py.File(DATASET_PATH, 'r')
@@ -74,7 +74,7 @@ l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(l4, num_units=512)
 
-l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
+l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax, W=nn.init.Normal(0.001))
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
@@ -85,7 +85,7 @@ loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
 updates_train = OrderedDict(nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY))
-updates_train[l6.W] += SOFTMAX_LAMBDA * T.mean(T.sqr(l6.W)) # L2 loss on the softmax weights to avoid saturation
+# updates_train[l6.W] += SOFTMAX_LAMBDA * T.mean(T.sqr(l6.W)) # L2 loss on the softmax weights to avoid saturation
 
 y_pred_train = T.argmax(l6.get_output(), axis=1)
 y_pred_eval = T.argmax(l6.get_output(deterministic=True), axis=1)
