@@ -74,9 +74,9 @@ l3 = nn.layers.FeaturePoolLayer(l3a, ds=2, axis=2)
 l4a = nn.layers.Conv1DLayer(l3, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
 l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
-l5 = nn.layers.DenseLayer(l4, num_units=512)
+l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=512)
 
-l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
+l6 = nn.layers.DenseLayer(nn.layers.dropout(l5, p=0.5), num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
