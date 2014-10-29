@@ -1,9 +1,11 @@
-* loss can be NaN, fix this
-    - learning rate is not the issue
+* implement L2 version of Crammer and Singer hinge loss
+    * version with sum over labels
+    * version with max over incorrect labels
 
-* add dropout in the dense layers once the model's ability to overfit has been established
+* confusion matrices could be very informative, compute them
 
-* confusion matrices?
+
+* loss can still be NaN for softmax + crossentropy, using the clipped crossentropy is a bit of a hack. Is there a cleaner way to solve this?
 
 possible architectures for the convolutional part:
 

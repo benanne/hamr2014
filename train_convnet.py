@@ -12,8 +12,8 @@ from collections import OrderedDict
 # DATASET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
 DATASET_PATH = "data/spectrograms.h5"
 NUM_CLASSES = 10
-CHUNK_SIZE = 4096
-NUM_CHUNKS = 5000
+CHUNK_SIZE = 8 * 4096
+NUM_CHUNKS = 1000
 NUM_TIMESTEPS_AUG = 110
 MB_SIZE = 128
 LEARNING_RATE = 0.01 # 0.01
@@ -38,9 +38,10 @@ num_examples_train, num_mel_components, num_timesteps = data_train.shape
 num_batches_train = CHUNK_SIZE // MB_SIZE
 
 offset_eval = (num_timesteps - NUM_TIMESTEPS_AUG) // 2
-chunk_eval = spectrograms[idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
+data_eval = spectrograms[idcs_eval, :, :]
 labels_eval = d['classids'][idcs_eval]
-num_batches_eval = chunk_eval.shape[0] // MB_SIZE
+
+num_examples_eval = data.eval.shape[0]
 
 def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug):
     for k in xrange(num_chunks):
@@ -55,6 +56,19 @@ def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug):
         yield chunk, labels
 
 train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG)
+
+# generate fixed evaluation chunk
+chunk_eval = np.empty((chunk_size, num_mel_components, num_timesteps,aug), dtype='float32')
+idcs = np.random.randint(0, num_examples_eval, chunk_size)
+offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
+
+for l in xrange(chunk_size):
+    chunk_eval[l] = data_eval[idcs_eval[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
+
+chunk_eval_labels = labels_eval[idcs]
+# chunk_eval = spectrograms[idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
+num_batches_eval = chunk_eval.shape[0] // MB_SIZE
+
 
 
 ## architecture
@@ -103,7 +117,7 @@ X_train = nn.utils.shared_empty(dim=3)
 y_train = nn.utils.shared_empty(dim=1)
 
 X_eval = theano.shared(chunk_eval)
-y_eval = theano.shared(labels_eval)
+y_eval = theano.shared(chunk_eval_labels)
 
 
 index = T.lscalar("index")
