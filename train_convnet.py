@@ -16,7 +16,7 @@ CHUNK_SIZE = 4096
 NUM_CHUNKS = 5000
 NUM_TIMESTEPS_AUG = 110
 MB_SIZE = 128
-LEARNING_RATE = 0.1 # 0.01
+LEARNING_RATE = 0.01 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1
@@ -30,8 +30,8 @@ idcs_eval = (folds == 9) | (folds == 10)
 idcs_train = ~idcs_eval
 
 spectrograms = d['spectrograms'][:]
-spectrograms_rms = np.sqrt(np.mean(spectrograms**2))
-spectrograms /= spectrograms_rms # rescale, otherwise the values get too big.
+# spectrograms_rms = np.sqrt(np.mean(spectrograms**2))
+spectrograms /= 10 # spectrograms_rms # rescale, otherwise the values get too big.
 
 data_train = spectrograms[idcs_train, :, :]
 labels_train = d['classids'][idcs_train]
@@ -78,7 +78,7 @@ l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(l4, num_units=512)
 
-l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax) # , W=nn.init.Normal(0.001))
+l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
