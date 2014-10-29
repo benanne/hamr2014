@@ -63,7 +63,7 @@ idcs = np.random.randint(0, num_examples_eval, CHUNK_SIZE)
 offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, CHUNK_SIZE)
 
 for l in xrange(chunk_size):
-    chunk_eval[l] = data_eval[idcs_eval[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
+    chunk_eval[l] = data_eval[idcs_eval[l], :, offsets[l]:offsets[l] + NUM_TIMESTEPS_AUG]
 
 chunk_eval_labels = labels_eval[idcs]
 # chunk_eval = spectrograms[idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
