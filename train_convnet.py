@@ -105,12 +105,12 @@ givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
-# iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
+iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
-# TODO DEBUG
-from pylearn2.devtools.nan_guard import NanGuardMode
-mode = NanGuardMode(True, True, True)
-iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train, mode=mode)
+# # DEBUG
+# from pylearn2.devtools.nan_guard import NanGuardMode
+# mode = NanGuardMode(True, True, True)
+# iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train, mode=mode)
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
@@ -135,6 +135,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     accs_train = []
     for b in xrange(num_batches_train):
         loss_train, acc_train = iter_train(b)
+        print loss_train # TODO DEBUG
         if np.isnan(loss_train):
             raise RuntimeError("loss_train is NaN")
 
@@ -144,7 +145,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     avg_loss_train = np.mean(losses_train)
     avg_acc_train = np.mean(accs_train)
     print "  avg training loss: %.5f" % avg_loss_train
-    print "  avg accuracy: %.3f%%" % (avg_acc_train * 100)
+    print "  avg training accuracy: %.3f%%" % (avg_acc_train * 100)
 
     if (k + 1) % EVALUATE_EVERY == 0:
         print "  evaluate"
@@ -161,5 +162,5 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         avg_loss_eval = np.mean(losses_eval)
         avg_acc_eval = np.mean(accs_eval)
         print "  avg evaluation loss: %.5f" % avg_loss_eval
-        print "  avg accuracy: %.3f%%" % (avg_acc_eval * 100)
+        print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
 
