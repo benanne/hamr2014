@@ -16,7 +16,7 @@ CHUNK_SIZE = 4096
 NUM_CHUNKS = 5000
 NUM_TIMESTEPS_AUG = 110
 MB_SIZE = 128
-LEARNING_RATE = 0.01 # 0.01
+LEARNING_RATE = 0.1 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1
@@ -30,8 +30,6 @@ idcs_eval = (folds == 9) | (folds == 10)
 idcs_train = ~idcs_eval
 
 spectrograms = d['spectrograms'][:]
-# spectrograms_rms = np.sqrt(np.mean(spectrograms**2))
-spectrograms /= 10 # spectrograms_rms # rescale, otherwise the values get too big.
 
 data_train = spectrograms[idcs_train, :, :]
 labels_train = d['classids'][idcs_train]
@@ -84,7 +82,11 @@ all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
-obj = nn.objectives.Objective(l6, loss_function=nn.objectives.crossentropy)
+def clipped_crossentropy(x, t, m=0.001):
+    x = T.clip(x, m, 1 - m)
+    return T.mean(T.nnet.binary_crossentropy(x, t))
+
+obj = nn.objectives.Objective(l6, loss_function=clipped_crossentropy) # loss_function=nn.objectives.crossentropy)
 loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
