@@ -41,7 +41,7 @@ offset_eval = (num_timesteps - NUM_TIMESTEPS_AUG) // 2
 data_eval = spectrograms[idcs_eval, :, :]
 labels_eval = d['classids'][idcs_eval]
 
-num_examples_eval = data.eval.shape[0]
+num_examples_eval = data_eval.shape[0]
 
 def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug):
     for k in xrange(num_chunks):
