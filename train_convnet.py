@@ -58,7 +58,7 @@ def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug):
 train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG)
 
 # generate fixed evaluation chunk
-chunk_eval = np.empty((chunk_size, num_mel_components, num_timesteps_aug), dtype='float32')
+chunk_eval = np.empty((CHUNK_SIZE, num_mel_components, num_timesteps_aug), dtype='float32')
 idcs = np.random.randint(0, num_examples_eval, CHUNK_SIZE)
 offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, CHUNK_SIZE)
 
