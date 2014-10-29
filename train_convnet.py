@@ -70,16 +70,16 @@ num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 l_in = nn.layers.InputLayer((MB_SIZE, num_mel_components, NUM_TIMESTEPS_AUG))
 
-l1a = nn.layers.Conv1DLayer(l_in, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
+l1a = nn.layers.Conv1DLayer(nn.layers.dropout(l_in, p=0.5), num_filters=128, filter_length=3, convolution=conv.conv1d_md)
 l1 = nn.layers.FeaturePoolLayer(l1a, ds=2, axis=2) # abusing the feature pool layer as a regular 1D max pooling layer
 
-l2a = nn.layers.Conv1DLayer(l1, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
+l2a = nn.layers.Conv1DLayer(nn.layers.dropout(l1, p=0.5), num_filters=128, filter_length=3, convolution=conv.conv1d_md)
 l2 = nn.layers.FeaturePoolLayer(l2a, ds=2, axis=2)
 
-l3a = nn.layers.Conv1DLayer(l2, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
+l3a = nn.layers.Conv1DLayer(nn.layers.dropout(l2, p=0.5), num_filters=128, filter_length=3, convolution=conv.conv1d_md)
 l3 = nn.layers.FeaturePoolLayer(l3a, ds=2, axis=2)
 
-l4a = nn.layers.Conv1DLayer(l3, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
+l4a = nn.layers.Conv1DLayer(nn.layers.dropout(l3, p=0.5), num_filters=128, filter_length=3, convolution=conv.conv1d_md)
 l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=128)
