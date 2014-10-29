@@ -7,6 +7,8 @@ from nntools.theano_extensions import conv
 
 import h5py
 
+from collections import OrderedDict
+
 # DATASET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
 DATASET_PATH = "data/spectrograms.h5"
 NUM_CLASSES = 10
@@ -82,7 +84,7 @@ obj = nn.objectives.Objective(l6, loss_function=nn.objectives.crossentropy)
 loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
-updates_train = nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY)
+updates_train = OrderedDict(nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY))
 updates_train[l6.W] += SOFTMAX_LAMBDA * T.mean(T.sqr(l6.W)) # L2 loss on the softmax weights to avoid saturation
 
 y_pred_train = T.argmax(l6.get_output(), axis=1)
