@@ -46,7 +46,7 @@ num_examples_eval = data_eval.shape[0]
 def build_chunk(data, labels, chunk_size, num_timesteps_aug):
     chunk = np.empty((chunk_size, num_mel_components, num_timesteps_aug), dtype='float32')
     idcs = np.random.randint(0, data.shape[0], chunk_size)
-    offset = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
+    offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
 
     for l in xrange(chunk_size):
         chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
