@@ -111,6 +111,7 @@ iter_train = theano.function([index], [loss_train, acc_train], givens=givens_tra
 # from pylearn2.devtools.nan_guard import NanGuardMode
 # mode = NanGuardMode(True, True, True)
 # iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train, mode=mode)
+debug_iter_train = theano.function([index], loss_train, givens=givens_train) # compute loss but don't compute updates
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
@@ -134,6 +135,11 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     losses_train = []
     accs_train = []
     for b in xrange(num_batches_train):
+        db_loss = debug_iter_train(b)
+        print "DEBUG DB_LOSS %.8f" % db_loss
+        if np.isnan(db_loss):
+            raise RuntimeError("db_loss is NaN")
+
         loss_train, acc_train = iter_train(b)
         # print "DEBUG MIN INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].min()
         # print "DEBUG MAX INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].max()
