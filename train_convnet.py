@@ -18,6 +18,7 @@ LEARNING_RATE = 0.1 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1
+SOFTMAX_LAMBDA = 0.001
 
 
 d = h5py.File(DATASET_PATH, 'r')
@@ -82,6 +83,7 @@ loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
 updates_train = nn.updates.nesterov_momentum(loss_train, all_params, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY)
+updates_train[l6.W] += SOFTMAX_LAMBDA * T.mean(T.sqr(l6.W)) # L2 loss on the softmax weights to avoid saturation
 
 y_pred_train = T.argmax(l6.get_output(), axis=1)
 y_pred_eval = T.argmax(l6.get_output(deterministic=True), axis=1)
@@ -98,8 +100,8 @@ y_eval = theano.shared(labels_eval)
 
 index = T.lscalar("index")
 
-acc_train = T.eq(y_pred_train, y_train[index * MB_SIZE:(index + 1) * MB_SIZE])
-acc_eval = T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE])
+acc_train = T.mean(T.eq(y_pred_train, y_train[index * MB_SIZE:(index + 1) * MB_SIZE]))
+acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE]))
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
@@ -111,7 +113,8 @@ iter_train = theano.function([index], [loss_train, acc_train], givens=givens_tra
 # from pylearn2.devtools.nan_guard import NanGuardMode
 # mode = NanGuardMode(True, True, True)
 # iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train, mode=mode)
-debug_iter_train = theano.function([index], loss_train, givens=givens_train) # compute loss but don't compute updates
+
+# debug_iter_train = theano.function([index], loss_train, givens=givens_train) # compute loss but don't compute updates
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
@@ -135,16 +138,16 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     losses_train = []
     accs_train = []
     for b in xrange(num_batches_train):
-        db_loss = debug_iter_train(b)
-        print "DEBUG DB_LOSS %.8f" % db_loss
-        if np.isnan(db_loss):
-            raise RuntimeError("db_loss is NaN")
+        # db_loss = debug_iter_train(b)
+        # print "DEBUG DB_LOSS %.8f" % db_loss
+        # if np.isnan(db_loss):
+        #     raise RuntimeError("db_loss is NaN")
 
         loss_train, acc_train = iter_train(b)
         # print "DEBUG MIN INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].min()
         # print "DEBUG MAX INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].max()
-        print "DEBUG PARAM STD " + " ".join(["%.4f" % p.get_value().std() for p in all_params])
-        print "DEBUG LOSS_TRAIN %.8f" % loss_train # TODO DEBUG
+        # print "DEBUG PARAM STD " + " ".join(["%.4f" % p.get_value().std() for p in all_params])
+        # print "DEBUG LOSS_TRAIN %.8f" % loss_train # TODO DEBUG
         if np.isnan(loss_train):
             raise RuntimeError("loss_train is NaN")
 
