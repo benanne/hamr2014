@@ -137,7 +137,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         loss_train, acc_train = iter_train(b)
         # print "DEBUG MIN INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].min()
         # print "DEBUG MAX INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].max()
-        print "DEBUG PARAM STD " + ["%.4f" % p.get_value().std() for p in all_params]
+        print "DEBUG PARAM STD " + " ".join(["%.4f" % p.get_value().std() for p in all_params])
         print "DEBUG LOSS_TRAIN %.8f" % loss_train # TODO DEBUG
         if np.isnan(loss_train):
             raise RuntimeError("loss_train is NaN")
