@@ -19,7 +19,7 @@ MB_SIZE = 128
 LEARNING_RATE = 0.01 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
-EVALUATE_EVERY = 10
+EVALUATE_EVERY = 1 # always validate since it's fast enough
 # SOFTMAX_LAMBDA = 0.01
 
 
