@@ -29,14 +29,18 @@ folds = d['folds'][:]
 idcs_eval = (folds == 9) | (folds == 10)
 idcs_train = ~idcs_eval
 
-data_train = d['spectrograms'][idcs_train, :, :]
+spectrograms = d['spectrograms'][:]
+spectrograms_rms = np.sqrt(np.mean(spectrograms**2))
+spectrograms /= spectrograms_rms # rescale, otherwise the values get too big.
+
+data_train = spectrograms[idcs_train, :, :]
 labels_train = d['classids'][idcs_train]
 
 num_examples_train, num_mel_components, num_timesteps = data_train.shape
 num_batches_train = CHUNK_SIZE // MB_SIZE
 
 offset_eval = (num_timesteps - NUM_TIMESTEPS_AUG) // 2
-chunk_eval = d['spectrograms'][idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
+chunk_eval = spectrograms[idcs_eval, :, offset_eval:offset_eval + NUM_TIMESTEPS_AUG]
 labels_eval = d['classids'][idcs_eval]
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
@@ -74,7 +78,7 @@ l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(l4, num_units=512)
 
-l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax, W=nn.init.Normal(0.001))
+l6 = nn.layers.DenseLayer(l5, num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax) # , W=nn.init.Normal(0.001))
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
