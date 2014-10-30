@@ -11,7 +11,7 @@ import h5py
 
 
 SOURCE_PATH = "/home/sedielem/data/urbansound8k/audio_remuxed"
-TARGET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
+TARGET_PATH = "/home/sedielem/data/urbansound8k/spectrograms_uncompressed.h5"
 SIZE = 8732
 N_FOLDS = 10
 
@@ -19,7 +19,7 @@ SAMPLERATE = 22050
 N_FFT = 2048
 HOP_LENGTH = 512
 N_MELS = 128
-C = 10000
+# C = 10000
 
 
 n_samples = SAMPLERATE * 4 # each clip is padded to 4 seconds (the maximal length)
@@ -53,7 +53,7 @@ for f in xrange(1, N_FOLDS + 1):
         y_padded[offset:offset + y.shape[0]] = y
 
         s = librosa.feature.melspectrogram(y_padded, sr=SAMPLERATE, n_fft=N_FFT, hop_length=HOP_LENGTH, n_mels=N_MELS)
-        s = np.log(1 + C*s) # s = librosa.logamplitude(s)
+        # s = np.log(1 + C*s) # s = librosa.logamplitude(s)
 
         # parse filename
         # [fsID]-[classID]-[occurrenceID]-[sliceID].wav
