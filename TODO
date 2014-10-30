@@ -2,15 +2,11 @@
     * version with sum over labels
     * version with max over incorrect labels
 
+* add refilter layers after convolution layers to reduce the number of parameters
+
+* add more augmentation methods: non-integer shifts, small frequency shifts, time stretching (use scikit-image code from kaggle-galaxies)
+
 * confusion matrices could be very informative, compute them
 
 
 * loss can still be NaN for softmax + crossentropy, using the clipped crossentropy is a bit of a hack. Is there a cleaner way to solve this?
-
-possible architectures for the convolutional part:
-
-8 <=(3)= 10 <=[2]= 20 <=(3)= 22 <=[2]= 44 <=(3)= 46 <=[2]= 92 <=(3)= 94
-
-9 <=(3)= 11 <=[2]= 22 <=(3)= 24 <=[2]= 48 <=(3)= 50 <=[2]= 100 <=(3)= 102
-
-10 <=(3)= 12 <=[2]= 24 <=(3)= 26 <=[2]= 52 <=(3)= 54 <=[2]= 108 <=(3)= 110
