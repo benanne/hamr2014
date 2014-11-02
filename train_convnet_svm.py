@@ -13,7 +13,7 @@ import skimage
 
 
 # DATASET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
-DATASET_PATH = "data/spectrograms_uncompressed.h5"
+DATASET_PATH = "data/spectrograms.h5" # "data/spectrograms_uncompressed.h5"
 NUM_CLASSES = 10
 CHUNK_SIZE = 8 * 4096
 NUM_CHUNKS = 1000
