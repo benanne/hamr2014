@@ -193,7 +193,8 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         if np.isnan(db_loss):
             raise RuntimeError("db_loss is NaN")
         if db_loss >= 1.0:
-            raise RuntimeError("db_loss is > 1.0, this can't be good. Figure out why.")
+            print "db_loss is > 1.0, continue?"
+            raw_input()
 
         loss_train, acc_train = iter_train(b)
         # print "DEBUG MIN INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].min()
