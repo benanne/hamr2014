@@ -117,7 +117,7 @@ print "parameter count: %d" % param_count
 
 def multiclass_svm(x, t, l2=True): # t are the indices of the target classes
     x_correct = x[:, t]
-    d = T.max(0, 1 + (x_correct - x)) # the margin between the correct x and all others should be >= 1
+    d = T.maximum(0, 1 + (x_correct - x)) # the margin between the correct x and all others should be >= 1
 
     # average over examples (axis=0) and classes (axis=1)
     if l2:
