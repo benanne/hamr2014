@@ -128,6 +128,8 @@ def multiclass_svm(x, t, l2=True): # t are the indices of the target classes
 # TODO: adapt
 
 obj = nn.objectives.Objective(l6, loss_function=multiclass_svm)
+obj.target_var = T.ivector("target")
+
 loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
