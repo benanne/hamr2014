@@ -109,7 +109,7 @@ l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
 
 l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=64)
 
-l6 = nn.layers.DenseLayer(nn.layers.dropout(l5, p=0.5), num_units=NUM_CLASSES, nonlinearity=T.nnet.softmax)
+l6 = nn.layers.DenseLayer(nn.layers.dropout(l5, p=0.5), num_units=NUM_CLASSES, nonlinearity=nn.nonlinearities.identity) # , nonlinearity=T.nnet.softmax)
 
 all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
