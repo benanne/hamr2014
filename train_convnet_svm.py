@@ -116,7 +116,7 @@ param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
 def multiclass_svm(x, t, l2=True): # t are the indices of the target classes
-    x_correct = x[:, t]
+    x_correct = x.T[t].T # x[:, t]
     d = T.maximum(0, 1 + (x_correct - x)) # the margin between the correct x and all others should be >= 1
 
     # average over examples (axis=0) and classes (axis=1)
