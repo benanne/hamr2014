@@ -115,8 +115,8 @@ all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
-def multiclass_svm(y, t, l2=True): # t are the indices of the target classes
-    y_correct = y[T.arange(y.shape[0]), t].dimshuffle(0, 'x')
+def multiclass_svm(y, t, l2=True): # t is one-hot
+    y_correct = (y * t).sum(1).dimshuffle(0, 'x')
     d = T.maximum(0, 1 + (y_correct - y)) # the margin between the correct x and all others should be >= 1
 
     # average over examples (axis=0) and classes (axis=1)
@@ -156,7 +156,7 @@ acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: T.cast(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], 'int32'), # nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
@@ -169,7 +169,7 @@ iter_train = theano.function([index], [loss_train, acc_train], givens=givens_tra
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: T.cast(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], 'int32'), # nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
 
