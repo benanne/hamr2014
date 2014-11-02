@@ -20,7 +20,7 @@ NUM_CHUNKS = 1000
 NUM_TIMESTEPS_AUG = 110
 NUM_FREQ_COMPONENTS_AUG = 128
 MB_SIZE = 128
-LEARNING_RATE = 0.001 # 0.01
+LEARNING_RATE = 0.01 # 0.01
 MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1 # always validate since it's fast enough
@@ -48,45 +48,42 @@ labels_eval = d['classids'][idcs_eval]
 
 num_examples_eval = data_eval.shape[0]
 
-# def build_chunk(data, labels, chunk_size, num_timesteps_aug):
-#     chunk = np.empty((chunk_size, num_freq_components, num_timesteps_aug), dtype='float32')
-#     idcs = np.random.randint(0, data.shape[0], chunk_size)
-#     offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
-
-#     for l in xrange(chunk_size):
-#         chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
-
-#     return chunk, labels[idcs]
-
-def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components_aug):
+def build_chunk(data, labels, chunk_size, num_timesteps_aug):
     chunk = np.empty((chunk_size, num_freq_components, num_timesteps_aug), dtype='float32')
     idcs = np.random.randint(0, data.shape[0], chunk_size)
-    offsets_time = np.random.uniform(0, num_timesteps - num_timesteps_aug, chunk_size)
-    offsets_freq = np.random.uniform(0, num_freq_components - num_freq_components_aug, chunk_size)
-
+    offsets = np.random.randint(0, num_timesteps - num_timesteps_aug, chunk_size)
 
     for l in xrange(chunk_size):
-        # chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
-        pass # TODO
-
-    chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
-    # TODO: librosa?
+        chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
 
     return chunk, labels[idcs]
 
+# def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components_aug):
+#     chunk = np.empty((chunk_size, num_freq_components, num_timesteps_aug), dtype='float32')
+#     idcs = np.random.randint(0, data.shape[0], chunk_size)
+#     offsets_time = np.random.uniform(0, num_timesteps - num_timesteps_aug, chunk_size)
+#     offsets_freq = np.random.uniform(0, num_freq_components - num_freq_components_aug, chunk_size)
+
+
+#     for l in xrange(chunk_size):
+#         # chunk[l] = data[idcs[l], :, offsets[l]:offsets[l] + num_timesteps_aug]
+#         pass # TODO
+
+#     chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
+#     # TODO: librosa?
+
+#     return chunk, labels[idcs]
 
 
 
-
-
-def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug, num_freq_components_aug):
+def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug): # , num_freq_components_aug):
     for k in xrange(num_chunks):
-        yield build_chunk(data_train, labels_train, chunk_size, num_timesteps_aug, num_freq_components_aug)
+        yield build_chunk(data_train, labels_train, chunk_size, num_timesteps_aug) # , num_freq_components_aug)
 
-train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG) # , NUM_FREQ_COMPONENTS_AUG)
 
 # generate fixed evaluation chunk
-chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG) # , NUM_FREQ_COMPONENTS_AUG)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
@@ -118,11 +115,19 @@ all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
-def clipped_crossentropy(x, t, m=0.001):
-    x = T.clip(x, m, 1 - m)
-    return T.mean(T.nnet.binary_crossentropy(x, t))
+def multiclass_svm(x, t, l2=True): # t are the indices of the target classes
+    x_correct = x[:, t]
+    d = T.max(0, 1 + (x_correct - x)) # the margin between the correct x and all others should be >= 1
 
-obj = nn.objectives.Objective(l6, loss_function=clipped_crossentropy) # loss_function=nn.objectives.crossentropy)
+    # average over examples (axis=0) and classes (axis=1)
+    if l2:
+        return T.mean(d**2) # L2 SVM loss
+    else:
+        return T.mean(d) # true hinge loss
+
+# TODO: adapt
+
+obj = nn.objectives.Objective(l6, loss_function=multiclass_svm)
 loss_train = obj.get_loss()
 loss_eval = obj.get_loss(deterministic=True)
 
@@ -149,7 +154,7 @@ acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: y_train[index * MB_SIZE:(index + 1) * MB_SIZE], # nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
@@ -162,7 +167,7 @@ iter_train = theano.function([index], [loss_train, acc_train], givens=givens_tra
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], # nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
 

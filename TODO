@@ -1,14 +1,23 @@
-* measure if realtime spectrogram extraction during training is viable
-    * 27ms for a 4s spectrogram extraction. That's probably too slow. Can this be parallelized across multiple clips?
+* implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
+    * non-integer time shifting
+    * non-integer freq shifting
 
-* extract non-scaled spectrograms so C can be tuned afterwards (+ we can use the librosa approach to compare)
+    * time stretching
 
-at the spectrogram level:
-* implement additive / multiplicative noise
-* implement random equalization augmentation
-* implement time stretching
-* implement freq/pitch shifting
-* implement non-integer time shifting
+    * additive / multiplicative noise
+
+    * random equalization augmentation
+
+    - use scikit-image (look into how to do this again)
+    - don't forget to apply compression afterwards
+
+
+
+* consider doing the spectrogram extraction on the GPU, with data loaded onto the GPU per batch. This might be fast enough and allows for: 
+    * changing window sizes / hop sizes
+    * augmentation in the time domain
+        - time stretching and frequency shifting should be easier in the frequency domain though (need a time-freq representation for this anyway)
+
 
 
 * implement L2 version of Crammer and Singer hinge loss
