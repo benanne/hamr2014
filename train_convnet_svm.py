@@ -117,7 +117,7 @@ print "parameter count: %d" % param_count
 
 def multiclass_svm(y, t, l2=True): # t is one-hot
     y_correct = (y * t).sum(1).dimshuffle(0, 'x')
-    d = T.maximum(0, 1 + (y_correct - y)) # the margin between the correct x and all others should be >= 1
+    d = T.maximum(0, 1 - (y_correct - y)) # the margin between the correct x and all others should be >= 1
 
     # average over examples (axis=0) and classes (axis=1)
     if l2:
