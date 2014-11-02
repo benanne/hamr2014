@@ -115,9 +115,9 @@ all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
-def multiclass_svm(x, t, l2=True): # t are the indices of the target classes
-    x_correct = x[T.arange(x.shape[0]), t].T # not sure what I'm doing here
-    d = T.maximum(0, 1 + (x_correct - x)) # the margin between the correct x and all others should be >= 1
+def multiclass_svm(y, t, l2=True): # t are the indices of the target classes
+    y_correct = y[T.arange(y.shape[0]), t].dimshuffle(0, 'x')
+    d = T.maximum(0, 1 + (y_correct - y)) # the margin between the correct x and all others should be >= 1
 
     # average over examples (axis=0) and classes (axis=1)
     if l2:
