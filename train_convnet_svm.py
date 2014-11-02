@@ -154,7 +154,7 @@ acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: y_train[index * MB_SIZE:(index + 1) * MB_SIZE], # nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: T.cast(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], 'int32'), # nn.utils.one_hot(y_train[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_train = theano.function([index], [loss_train, acc_train], givens=givens_train, updates=updates_train)
 
@@ -167,7 +167,7 @@ iter_train = theano.function([index], [loss_train, acc_train], givens=givens_tra
 
 givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
-    obj.target_var: y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], # nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
+    obj.target_var: T.cast(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], 'int32'), # nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
 iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
 
