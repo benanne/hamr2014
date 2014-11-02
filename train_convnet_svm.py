@@ -115,7 +115,7 @@ all_params = nn.layers.get_all_params(l6)
 param_count = sum([np.prod(p.get_value().shape) for p in all_params])
 print "parameter count: %d" % param_count
 
-def multiclass_svm(y, t, l2=True): # t is one-hot
+def multiclass_svm(y, t, l2=False): # t is one-hot
     y_correct = (y * t).sum(1).dimshuffle(0, 'x')
     d = T.maximum(0, 1 - (y_correct - y)) # the margin between the correct x and all others should be >= 1
 
@@ -192,9 +192,9 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         print "DEBUG DB_LOSS %.8f" % db_loss
         if np.isnan(db_loss):
             raise RuntimeError("db_loss is NaN")
-        if db_loss >= 1.0:
-            print "db_loss is > 1.0, continue?"
-            raw_input()
+        # if db_loss >= 1.0:
+        #     print "db_loss is > 1.0, continue?"
+        #     raw_input()
 
         loss_train, acc_train = iter_train(b)
         # print "DEBUG MIN INPUT %.8f" % chunk_data[b*MB_SIZE:(b+1)*MB_SIZE].min()
