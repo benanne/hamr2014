@@ -13,18 +13,14 @@
 
 
 
+* average over perturbations at test time!
+
 * consider doing the spectrogram extraction on the GPU, with data loaded onto the GPU per batch. This might be fast enough and allows for: 
     * changing window sizes / hop sizes
     * augmentation in the time domain
         - time stretching and frequency shifting should be easier in the frequency domain though (need a time-freq representation for this anyway)
 
 
-
-* implement L2 version of Crammer and Singer hinge loss
-    * version with sum over labels
-    * version with max over incorrect labels
-
-* add refilter layers after convolution layers to reduce the number of parameters
 
 * add more augmentation methods: non-integer shifts, small frequency shifts, time stretching (use scikit-image code from kaggle-galaxies)
 
