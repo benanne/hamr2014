@@ -1,30 +1,30 @@
-* implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
-    * non-integer time shifting
-    * non-integer freq shifting
+* speed up data augmentation with multiprocessing + do it in parallel with training
+    * a separate thread is probably fine, don't need a process.
+    * this also allows for the launched processes to be daemonized, which makes CTRL+C behave better
 
-    * time stretching
+
+* consider spectrograms with fewer frequency components... 128 may be overkill for fairly non-harmonic sounds like these. 64 or even 32 could suffice!
+    * this will also speed up data augmentation
+
+
+
+D implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
+    X non-integer time shifting
+    X non-integer freq shifting
+    X time stretching
 
     * additive / multiplicative noise
-
     * random equalization augmentation
 
-    - use scikit-image (look into how to do this again)
-    - don't forget to apply compression afterwards
 
+* average over several fixed perturbations for evaluation to get a better estimate (and probably improved score)!
 
+* confusion matrices could be very informative, compute them
 
-* average over perturbations at test time!
+* try logistic + crossentropy again, but this time with the correct loss (i.e. not average binary crossentropy).
+
 
 * consider doing the spectrogram extraction on the GPU, with data loaded onto the GPU per batch. This might be fast enough and allows for: 
     * changing window sizes / hop sizes
     * augmentation in the time domain
         - time stretching and frequency shifting should be easier in the frequency domain though (need a time-freq representation for this anyway)
-
-
-
-* add more augmentation methods: non-integer shifts, small frequency shifts, time stretching (use scikit-image code from kaggle-galaxies)
-
-* confusion matrices could be very informative, compute them
-
-
-* loss can still be NaN for softmax + crossentropy, using the clipped crossentropy is a bit of a hack. Is there a cleaner way to solve this?
