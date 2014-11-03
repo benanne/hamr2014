@@ -17,12 +17,12 @@ plt.ion()
 
 
 # DATASET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
-DATASET_PATH = "data/spectrograms_uncompressed.h5"
+DATASET_PATH = "data/spectrograms_uncompressed_32.h5"
 NUM_CLASSES = 10
 CHUNK_SIZE = 8 * 4096
 NUM_CHUNKS = 1000
 NUM_TIMESTEPS_AUG = 110
-NUM_FREQ_COMPONENTS_AUG = 120
+NUM_FREQ_COMPONENTS_AUG = 28 # 120
 MB_SIZE = 128
 LEARNING_RATE = 0.01 # 0.01
 MOMENTUM = 0.9
@@ -79,7 +79,7 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
         out = fast_warp(data[idcs[l]], tform_augment, output_shape=(num_freq_components_aug, num_timesteps_aug), mode='reflect').astype('float32')
 
         # TODO: add equalization augmentation, noise, ...
-        
+
         chunk[l] = out
 
     chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression

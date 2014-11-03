@@ -6,6 +6,7 @@
 * consider spectrograms with fewer frequency components... 128 may be overkill for fairly non-harmonic sounds like these. 64 or even 32 could suffice!
     * this will also speed up data augmentation
 
+* try reducing compression
 
 
 D implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
