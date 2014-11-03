@@ -79,9 +79,7 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
         out = fast_warp(data[idcs[l]], tform_augment, output_shape=(num_freq_components_aug, num_timesteps_aug), mode='reflect').astype('float32')
 
         # TODO: add equalization augmentation, noise, ...
-
-        import pdb; pdb.set_trace()
-
+        
         chunk[l] = out
 
     chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
