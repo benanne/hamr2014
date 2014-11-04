@@ -9,24 +9,28 @@
 * consider spectrograms with fewer frequency components... 128 may be overkill for fairly non-harmonic sounds like these. 64 or even 32 could suffice!
     * this will also speed up data augmentation
 
-* try reducing compression
+* try reducing spectrogram compression
+* consider different numbers of frequency components as well
 
-D implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
-    X non-integer time shifting
-    X non-integer freq shifting
-    X time stretching
-
+* extend build_chunk to do more augmentation:
     * additive / multiplicative noise
     * random equalization augmentation
+
 
 
 * average over several fixed perturbations for evaluation to get a better estimate (and probably improved score)!
 
 * confusion matrices could be very informative, compute them
+* look at worst predicted examples (visualise them)
 
 * try logistic + crossentropy again, but this time with the correct loss (i.e. not average binary crossentropy).
 
 * add a decreasing learning rate schedule
+
+
+
+* try 2D convolution
+    * maybe + constant Q
 
 
 
