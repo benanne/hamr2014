@@ -131,7 +131,7 @@ print "parameter count: %d" % param_count
 
 def ova_svm(y, t, l2=True): # t is one-hot
     tn = 2*t - 1
-    d = T.maximum(0, 1 - t*y)
+    d = T.maximum(0, 1 - tn*y)
 
     # average over examples (axis=0) and classes (axis=1)
     if l2:
