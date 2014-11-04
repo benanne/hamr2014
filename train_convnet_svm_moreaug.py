@@ -103,13 +103,13 @@ def build_chunk_fixed(data, labels, num_examples):
     chunk_size = num_examples * num_tfs_fixed
 
     chunk = np.empty((chunk_size, NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG), dtype='float32')
-    chunk_labels = np.empty((num_examples,), dtype='int32')
+    chunk_labels = np.empty((chunk_size,), dtype='int32')
 
     for k in xrange(num_examples):
-        chunk_labels[k] = labels[k]
         for l, tf in enumerate(tfs_fixed):
             out = fast_warp(data[k], tf, output_shape=(NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG), mode='reflect').astype('float32')
             chunk[k * num_tfs_fixed + l] = out
+            chunk_labels[k * num_tfs_fixed + l] = labels[k]
     
     chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
 
