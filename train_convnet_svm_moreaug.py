@@ -97,7 +97,7 @@ def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug, num_freq_compone
 
 
 train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
-train_gen = buffering.buffered_gen_threaded(train_gen, buffer_size=2)
+train_gen = buffering.buffered_gen_mp(train_gen, buffer_size=2) # buffering.buffered_gen_threaded(train_gen, buffer_size=2)
 
 # generate fixed evaluation chunk
 chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
