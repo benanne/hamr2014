@@ -11,13 +11,13 @@ import h5py
 
 
 SOURCE_PATH = "/home/sedielem/data/urbansound8k/audio_remuxed"
-TARGET_PATH = "/home/sedielem/data/urbansound8k/spectrograms_uncompressed_32.h5"
+TARGET_PATH = "/home/sedielem/data/urbansound8k/spectrograms_uncompressed_32_1024.h5"
 SIZE = 8732
 N_FOLDS = 10
 
 SAMPLERATE = 22050
 N_FFT = 2048
-HOP_LENGTH = 512
+HOP_LENGTH = 1024 # 512
 N_MELS = 32 # 128
 # C = 10000
 
