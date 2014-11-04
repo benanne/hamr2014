@@ -1,3 +1,6 @@
+* try reducing the time dimension, 3/4 overlap may be overkill
+
+
 * try the librosa compression method
 
 * consider different numbers of frequency components as well

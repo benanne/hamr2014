@@ -137,26 +137,16 @@ num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 l_in = nn.layers.InputLayer((MB_SIZE, NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG))
 
-l1a = nn.layers.Conv1DLayer(l_in, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l1a = nn.layers.Conv1DLayer(l_in, num_filters=16, filter_length=3, convolution=conv.conv1d_md)
 l1 = nn.layers.FeaturePoolLayer(l1a, ds=2, axis=2) # abusing the feature pool layer as a regular 1D max pooling layer
 
-l2a = nn.layers.Conv1DLayer(l1, num_filters=64, filter_length=3, convolution=conv.conv1d_md)
-l2b = nn.layers.NINLayer(l2a, num_units=32)
-l2 = nn.layers.FeaturePoolLayer(l2b, ds=2, axis=2)
+l2a = nn.layers.Conv1DLayer(l1, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l2 = nn.layers.FeaturePoolLayer(l2a, ds=2, axis=2)
 
-l3a = nn.layers.Conv1DLayer(l2, num_filters=128, filter_length=3, convolution=conv.conv1d_md)
-l3b = nn.layers.NINLayer(l3a, num_units=32)
-l3 = nn.layers.FeaturePoolLayer(l3b, ds=2, axis=2)
+l3a = nn.layers.Conv1DLayer(l2, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l3 = nn.layers.GlobalPoolLayer(l3a) # global mean pooling across the time axis
 
-l4a_mean = nn.layers.Conv1DLayer(l3, num_filters=24, filter_length=3, convolution=conv.conv1d_md)
-l4_mean = nn.layers.GlobalPoolLayer(l4a_mean) # global mean pooling across the time axis
-
-l4a_max = nn.layers.Conv1DLayer(l3, num_filters=8, filter_length=3, convolution=conv.conv1d_md)
-l4_max = nn.layers.GlobalPoolLayer(l4a_max, pool_function=T.max) # global max pooling across the time axis
-
-l4 = nn.layers.ConcatLayer([l4a_mean, l4a_max])
-
-l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=128)
+l5 = nn.layers.DenseLayer(nn.layers.dropout(l3, p=0.5), num_units=64)
 
 l6 = nn.layers.DenseLayer(nn.layers.dropout(l5, p=0.5), num_units=NUM_CLASSES, nonlinearity=nn.nonlinearities.identity) # , nonlinearity=T.nnet.softmax)
 
