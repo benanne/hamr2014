@@ -225,7 +225,8 @@ givens_eval = {
     l_in.input_var: X_eval[index * MB_SIZE:(index + 1) * MB_SIZE],
     obj.target_var: nn.utils.one_hot(y_eval[index * MB_SIZE:(index + 1) * MB_SIZE], NUM_CLASSES),
 }
-iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
+# iter_eval = theano.function([index], [loss_eval, acc_eval], givens=givens_eval)
+iter_eval = theano.function([index], loss_eval, givens=givens_eval)
 
 pred_train = theano.function([index], y_pred_train, givens=givens_train, on_unused_input='ignore')
 pred_eval = theano.function([index], y_pred_eval, givens=givens_eval, on_unused_input='ignore')
@@ -287,7 +288,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         import pdb; pdb.set_trace() # TODO: compute evaluation accuracy after averaging
 
         print "  avg evaluation loss: %.5f" % avg_loss_eval
-        print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
+        # print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
 
     print "  %.2f seconds elapsed" % (time.time() - start_time)
 
