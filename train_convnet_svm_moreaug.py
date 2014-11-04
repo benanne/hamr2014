@@ -77,7 +77,6 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
     time_stretch = np.exp(np.random.normal(0, 0.1, chunk_size))
 
     for l in xrange(chunk_size):
-        print ".",
         tform_augment = skimage.transform.AffineTransform(scale=(time_stretch[l], 1.0), translation=(offsets_time[l], offsets_freq[l]))
         out = fast_warp(data[idcs[l]], tform_augment, output_shape=(num_freq_components_aug, num_timesteps_aug), mode='reflect').astype('float32')
 
