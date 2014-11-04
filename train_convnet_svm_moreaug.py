@@ -34,6 +34,7 @@ WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1 # always validate since it's fast enough
 # SOFTMAX_LAMBDA = 0.01
 COMPRESSION_CONSTANT = 10000
+NUM_EXAMPLES_EVAL_USED = 1024
 
 
 d = h5py.File(DATASET_PATH, 'r')
@@ -126,7 +127,7 @@ train_gen = buffering.buffered_gen_mp(train_gen, buffer_size=2) # buffering.buff
 
 # generate fixed evaluation chunk
 # chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
-chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, num_examples_eval)
+chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, NUM_EXAMPLES_EVAL_USED)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
@@ -289,10 +290,13 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
 
         avg_loss_eval = np.mean(losses_eval)
 
-        import pdb; pdb.set_trace() # TODO: compute evaluation accuracy after averaging
+        outputs_eval_avged = np.concatenate(outputs_eval, axis=0).reshape((NUM_EXAMPLES_EVAL_USED, num_tfs_fixed, 10)).mean(1)
+        preds_eval_avged = np.argmax(outputs_eval_avged, axis=1)
+
+        avg_acc_eval = np.mean(preds_eval_avged == labels_eval[:NUM_EXAMPLES_EVAL_USED])
 
         print "  avg evaluation loss: %.5f" % avg_loss_eval
-        # print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
+        print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
 
     print "  %.2f seconds elapsed" % (time.time() - start_time)
 
