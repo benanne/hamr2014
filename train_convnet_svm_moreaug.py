@@ -126,7 +126,7 @@ train_gen = buffering.buffered_gen_mp(train_gen, buffer_size=2) # buffering.buff
 
 # generate fixed evaluation chunk
 # chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
-chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, 1024)
+chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, num_examples_eval)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
@@ -193,6 +193,8 @@ updates_train = OrderedDict(nn.updates.nesterov_momentum(loss_train, all_params,
 y_pred_train = T.argmax(l6.get_output(), axis=1)
 y_pred_eval = T.argmax(l6.get_output(deterministic=True), axis=1)
 
+output_eval = l6.get_output(deterministic=True)
+
 
 ## compile
 
@@ -230,6 +232,8 @@ iter_eval = theano.function([index], loss_eval, givens=givens_eval)
 
 pred_train = theano.function([index], y_pred_train, givens=givens_train, on_unused_input='ignore')
 pred_eval = theano.function([index], y_pred_eval, givens=givens_eval, on_unused_input='ignore')
+
+compute_output_eval = theano.function([index], output_eval, givens=givens_eval, on_unused_input='ignore')
 
 ## train
 
@@ -273,11 +277,11 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     if (k + 1) % EVALUATE_EVERY == 0:
         print "  evaluate"
         losses_eval = []
-        preds_eval = []
+        outputs_eval = []
         for b in xrange(num_batches_eval):
             # loss_eval, acc_eval = iter_eval(b)
             loss_eval = iter_eval(b)
-            preds_eval.append(pred_eval(b))
+            outputs_eval.append(compute_output_eval(b))
             if np.isnan(loss_eval):
                 raise RuntimeError("loss_eval is NaN")
 
