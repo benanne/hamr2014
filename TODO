@@ -1,4 +1,4 @@
-* try reducing spectrogram compression, or use the librosa method
+* try the librosa compression method
 
 * add a separate convlayer whose features are globally max-pooled (not shared with the mean pooling), then concatenate both. Should be useful for the gunshots?
 

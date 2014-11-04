@@ -33,7 +33,7 @@ MOMENTUM = 0.9
 WEIGHT_DECAY = 0.0
 EVALUATE_EVERY = 1 # always validate since it's fast enough
 # SOFTMAX_LAMBDA = 0.01
-COMPRESSION_CONSTANT = 100 # 10000
+COMPRESSION_CONSTANT = 10000
 NUM_EXAMPLES_EVAL_USED = 1024
 
 
@@ -148,8 +148,13 @@ l3a = nn.layers.Conv1DLayer(l2, num_filters=128, filter_length=3, convolution=co
 l3b = nn.layers.NINLayer(l3a, num_units=32)
 l3 = nn.layers.FeaturePoolLayer(l3b, ds=2, axis=2)
 
-l4a = nn.layers.Conv1DLayer(l3, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
-l4 = nn.layers.GlobalPoolLayer(l4a) # global mean pooling across the time axis
+l4a_mean = nn.layers.Conv1DLayer(l3, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l4_mean = nn.layers.GlobalPoolLayer(l4a_mean) # global mean pooling across the time axis
+
+l4a_max = nn.layers.Conv1DLayer(l3, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l4_max = nn.layers.GlobalPoolLayer(l4a_max, pool_function=T.max) # global mean pooling across the time axis
+
+l4 = nn.layers.ConcatLayer([l4a_mean, l4a_max])
 
 l5 = nn.layers.DenseLayer(nn.layers.dropout(l4, p=0.5), num_units=128)
 
