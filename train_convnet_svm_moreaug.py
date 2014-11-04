@@ -95,7 +95,7 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
 tfs_fixed = []
 for offset_time in np.linspace(0, num_timesteps - NUM_TIMESTEPS_AUG, 8):
     for offset_freq in np.linspace(0, num_freq_components - NUM_FREQ_COMPONENTS_AUG, 3):
-        tfs.append(skimage.transform.AffineTransform(translation=(offset_time, offset_freq)))
+        tfs_fixed.append(skimage.transform.AffineTransform(translation=(offset_time, offset_freq)))
 
 num_tfs_fixed = len(tfs_fixed)
 
