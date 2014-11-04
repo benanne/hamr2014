@@ -10,6 +10,7 @@ import buffering
 import h5py
 
 from collections import OrderedDict
+import time
 
 import skimage
 import skimage.transform
@@ -205,6 +206,8 @@ pred_eval = theano.function([index], y_pred_eval, givens=givens_eval, on_unused_
 
 ## train
 
+start_time = time.time()
+
 for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     print "chunk %d (%d of %d)" % (k, k + 1, NUM_CHUNKS)
 
@@ -256,4 +259,6 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         avg_acc_eval = np.mean(accs_eval)
         print "  avg evaluation loss: %.5f" % avg_loss_eval
         print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
+
+    print "  %.2f seconds elapsed" % (time.time() - start_time)
 
