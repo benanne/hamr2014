@@ -1,3 +1,6 @@
+* average over several fixed perturbations for evaluation to get a better estimate (and probably improved score)!
+    * implement build_chunk_fixed
+    
 * Try L2 hinge loss again, fix it
 * try OVA with binary SVMs instead
     R L2
@@ -8,9 +11,6 @@
     * this also allows for the launched processes to be daemonized, which makes CTRL+C behave better
 
 
-* consider spectrograms with fewer frequency components... 128 may be overkill for fairly non-harmonic sounds like these. 64 or even 32 could suffice!
-    * this will also speed up data augmentation
-
 * try reducing spectrogram compression
 * consider different numbers of frequency components as well
 
@@ -20,7 +20,6 @@
 
 
 
-* average over several fixed perturbations for evaluation to get a better estimate (and probably improved score)!
 
 * confusion matrices could be very informative, compute them
 * look at worst predicted examples (visualise them)
