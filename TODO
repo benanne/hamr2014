@@ -1,10 +1,7 @@
+* try reducing spectrogram compression, or use the librosa method
+
 * add a separate convlayer whose features are globally max-pooled (not shared with the mean pooling), then concatenate both. Should be useful for the gunshots?
 
-* average over several fixed perturbations for evaluation to get a better estimate (and probably improved score)!
-    * implement build_chunk_fixed
-
-
-* try reducing spectrogram compression, or use the librosa method
 * consider different numbers of frequency components as well
 
 * extend build_chunk to do more augmentation:
