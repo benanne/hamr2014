@@ -93,22 +93,22 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
 
 
 tfs_fixed = []
-for offset_time in np.linspace(0, num_timesteps - num_timesteps_aug, 8):
-    for offset_freq in np.linspace(0, num_freq_components - num_freq_components_aug, 3):
+for offset_time in np.linspace(0, num_timesteps - NUM_TIMESTEPS_AUG, 8):
+    for offset_freq in np.linspace(0, num_freq_components - NUM_FREQ_COMPONENTS_AUG, 3):
         tfs.append(skimage.transform.AffineTransform(translation=(offset_time, offset_freq)))
 
 num_tfs_fixed = len(tfs_fixed)
 
-def build_chunk_fixed(data, labels, num_examples, num_timesteps_aug, num_freq_components_aug):
+def build_chunk_fixed(data, labels, num_examples):
     chunk_size = num_examples * num_tfs_fixed
 
-    chunk = np.empty((chunk_size, num_freq_components_aug, num_timesteps_aug), dtype='float32')
+    chunk = np.empty((chunk_size, NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG), dtype='float32')
     chunk_labels = np.empty((num_examples,), dtype='int32')
 
     for k in xrange(num_examples):
         chunk_labels[k] = labels[k]
         for l, tf in enumerate(tfs_fixed):
-            out = fast_warp(data[k], tf, output_shape=(num_freq_components_aug, num_timesteps_aug), mode='reflect').astype('float32')
+            out = fast_warp(data[k], tf, output_shape=(NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG), mode='reflect').astype('float32')
             chunk[k * num_tfs_fixed + l] = out
     
     chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
@@ -126,7 +126,7 @@ train_gen = buffering.buffered_gen_mp(train_gen, buffer_size=2) # buffering.buff
 
 # generate fixed evaluation chunk
 # chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
-chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, 1024, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, 1024)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
@@ -284,7 +284,7 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         avg_loss_eval = np.mean(losses_eval)
 
         import pdb; pdb.set_trace() # TODO: compute evaluation accuracy after averaging
-        
+
         print "  avg evaluation loss: %.5f" % avg_loss_eval
         print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
 
