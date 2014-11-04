@@ -1,3 +1,6 @@
+* Try L2 hinge loss again, fix it
+* try OVA with binary SVMs instead
+
 * speed up data augmentation with multiprocessing + do it in parallel with training
     * a separate thread is probably fine, don't need a process.
     * this also allows for the launched processes to be daemonized, which makes CTRL+C behave better
