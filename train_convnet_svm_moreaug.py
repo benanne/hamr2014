@@ -5,6 +5,8 @@ import theano.tensor as T
 import nntools as nn
 from nntools.theano_extensions import conv
 
+import buffering
+
 import h5py
 
 from collections import OrderedDict
@@ -88,12 +90,13 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
     return chunk, labels[idcs]
 
 
-
 def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug, num_freq_components_aug):
     for k in xrange(num_chunks):
         yield build_chunk(data_train, labels_train, chunk_size, num_timesteps_aug, num_freq_components_aug)
 
+
 train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+train_gen = buffering.buffered_gen_threaded(train_gen, buffer_size=2)
 
 # generate fixed evaluation chunk
 chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)

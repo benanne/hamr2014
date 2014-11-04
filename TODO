@@ -1,5 +1,7 @@
 * Try L2 hinge loss again, fix it
 * try OVA with binary SVMs instead
+    R L2
+    * L1
 
 * speed up data augmentation with multiprocessing + do it in parallel with training
     * a separate thread is probably fine, don't need a process.
