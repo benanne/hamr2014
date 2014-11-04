@@ -6,20 +6,12 @@
     R L2
     * L1
 
-* speed up data augmentation with multiprocessing + do it in parallel with training
-    * a separate thread is probably fine, don't need a process.
-    * this also allows for the launched processes to be daemonized, which makes CTRL+C behave better
-
-
 * try reducing spectrogram compression
 * consider different numbers of frequency components as well
 
 * extend build_chunk to do more augmentation:
     * additive / multiplicative noise
     * random equalization augmentation
-
-
-
 
 * confusion matrices could be very informative, compute them
 * look at worst predicted examples (visualise them)
@@ -29,6 +21,8 @@
 * add a decreasing learning rate schedule
 
 
+
+* speed up augmentation: replace for loop over the chunk with mp.Pool#imap
 
 * try 2D convolution
     * maybe + constant Q
