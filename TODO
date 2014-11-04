@@ -11,7 +11,6 @@
 
 * try reducing compression
 
-
 D implement a new build_chunk function to do more advanced augmentation at the spectrogram level:
     X non-integer time shifting
     X non-integer freq shifting
@@ -27,6 +26,11 @@ D implement a new build_chunk function to do more advanced augmentation at the s
 
 * try logistic + crossentropy again, but this time with the correct loss (i.e. not average binary crossentropy).
 
+* add a decreasing learning rate schedule
+
+
+
+---
 
 * consider doing the spectrogram extraction on the GPU, with data loaded onto the GPU per batch. This might be fast enough and allows for: 
     * changing window sizes / hop sizes
