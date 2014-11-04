@@ -11,6 +11,7 @@ import h5py
 
 from collections import OrderedDict
 import time
+import itertools
 
 import skimage
 import skimage.transform
@@ -24,7 +25,7 @@ DATASET_PATH = "data/spectrograms_uncompressed_32.h5"
 NUM_CLASSES = 10
 CHUNK_SIZE = 8 * 4096
 NUM_CHUNKS = 1000
-NUM_TIMESTEPS_AUG = 142 # 110
+NUM_TIMESTEPS_AUG = 110
 NUM_FREQ_COMPONENTS_AUG = 28 # 120
 MB_SIZE = 128
 LEARNING_RATE = 0.01 # 0.01
@@ -91,6 +92,30 @@ def build_chunk(data, labels, chunk_size, num_timesteps_aug, num_freq_components
     return chunk, labels[idcs]
 
 
+tfs_fixed = []
+for offset_time in np.linspace(0, num_timesteps - num_timesteps_aug, 8):
+    for offset_freq in np.linspace(0, num_freq_components - num_freq_components_aug, 3):
+        tfs.append(skimage.transform.AffineTransform(translation=(offset_time, offset_freq)))
+
+num_tfs_fixed = len(tfs_fixed)
+
+def build_chunk_fixed(data, labels, num_examples, num_timesteps_aug, num_freq_components_aug):
+    chunk_size = num_examples * num_tfs_fixed
+
+    chunk = np.empty((chunk_size, num_freq_components_aug, num_timesteps_aug), dtype='float32')
+    chunk_labels = np.empty((num_examples,), dtype='int32')
+
+    for k in xrange(num_examples):
+        chunk_labels[k] = labels[k]
+        for l, tf in enumerate(tfs_fixed):
+            out = fast_warp(data[k], tf, output_shape=(num_freq_components_aug, num_timesteps_aug), mode='reflect').astype('float32')
+            chunk[k * num_tfs_fixed + l] = out
+    
+    chunk = np.log(1 + COMPRESSION_CONSTANT*chunk) # compression
+
+    return chunk, chunk_labels
+
+
 def train_chunks_gen(num_chunks, chunk_size, num_timesteps_aug, num_freq_components_aug):
     for k in xrange(num_chunks):
         yield build_chunk(data_train, labels_train, chunk_size, num_timesteps_aug, num_freq_components_aug)
@@ -100,7 +125,8 @@ train_gen = train_chunks_gen(NUM_CHUNKS, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ
 train_gen = buffering.buffered_gen_mp(train_gen, buffer_size=2) # buffering.buffered_gen_threaded(train_gen, buffer_size=2)
 
 # generate fixed evaluation chunk
-chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+# chunk_eval, chunk_eval_labels = build_chunk(data_eval, labels_eval, CHUNK_SIZE, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
+chunk_eval, chunk_eval_labels = build_chunk_fixed(data_eval, labels_eval, 1024, NUM_TIMESTEPS_AUG, NUM_FREQ_COMPONENTS_AUG)
 num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 
@@ -180,7 +206,7 @@ y_eval = theano.shared(chunk_eval_labels)
 index = T.lscalar("index")
 
 acc_train = T.mean(T.eq(y_pred_train, y_train[index * MB_SIZE:(index + 1) * MB_SIZE]))
-acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE]))
+# acc_eval = T.mean(T.eq(y_pred_eval, y_eval[index * MB_SIZE:(index + 1) * MB_SIZE]))
 
 givens_train = {
     l_in.input_var: X_train[index * MB_SIZE:(index + 1) * MB_SIZE],
@@ -246,17 +272,19 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
     if (k + 1) % EVALUATE_EVERY == 0:
         print "  evaluate"
         losses_eval = []
-        accs_eval = []
+        preds_eval = []
         for b in xrange(num_batches_eval):
             loss_eval, acc_eval = iter_eval(b)
+            preds_eval.append(pred_eval(b))
             if np.isnan(loss_eval):
                 raise RuntimeError("loss_eval is NaN")
 
             losses_eval.append(loss_eval)
-            accs_eval.append(acc_eval)
 
         avg_loss_eval = np.mean(losses_eval)
-        avg_acc_eval = np.mean(accs_eval)
+
+        import pdb; pdb.set_trace() # TODO: compute evaluation accuracy after averaging
+        
         print "  avg evaluation loss: %.5f" % avg_loss_eval
         print "  avg evaluation accuracy: %.3f%%" % (avg_acc_eval * 100)
 
