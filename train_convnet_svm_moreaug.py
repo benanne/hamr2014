@@ -148,10 +148,10 @@ l3a = nn.layers.Conv1DLayer(l2, num_filters=128, filter_length=3, convolution=co
 l3b = nn.layers.NINLayer(l3a, num_units=32)
 l3 = nn.layers.FeaturePoolLayer(l3b, ds=2, axis=2)
 
-l4a_mean = nn.layers.Conv1DLayer(l3, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l4a_mean = nn.layers.Conv1DLayer(l3, num_filters=24, filter_length=3, convolution=conv.conv1d_md)
 l4_mean = nn.layers.GlobalPoolLayer(l4a_mean) # global mean pooling across the time axis
 
-l4a_max = nn.layers.Conv1DLayer(l3, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
+l4a_max = nn.layers.Conv1DLayer(l3, num_filters=8, filter_length=3, convolution=conv.conv1d_md)
 l4_max = nn.layers.GlobalPoolLayer(l4a_max, pool_function=T.max) # global mean pooling across the time axis
 
 l4 = nn.layers.ConcatLayer([l4a_mean, l4a_max])
