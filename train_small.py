@@ -21,11 +21,11 @@ plt.ion()
 
 
 # DATASET_PATH = "/home/sedielem/data/urbansound8k/spectrograms.h5"
-DATASET_PATH = "data/spectrograms_uncompressed_32.h5"
+DATASET_PATH = "data/spectrograms_uncompressed_32_1024.h5"
 NUM_CLASSES = 10
 CHUNK_SIZE = 8 * 4096
 NUM_CHUNKS = 1000
-NUM_TIMESTEPS_AUG = 110
+NUM_TIMESTEPS_AUG = 58
 NUM_FREQ_COMPONENTS_AUG = 28 # 120
 MB_SIZE = 128
 LEARNING_RATE = 0.01 # 0.01
@@ -137,7 +137,7 @@ num_batches_eval = chunk_eval.shape[0] // MB_SIZE
 
 l_in = nn.layers.InputLayer((MB_SIZE, NUM_FREQ_COMPONENTS_AUG, NUM_TIMESTEPS_AUG))
 
-l1a = nn.layers.Conv1DLayer(l_in, num_filters=16, filter_length=3, convolution=conv.conv1d_md)
+l1a = nn.layers.Conv1DLayer(l_in, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
 l1 = nn.layers.FeaturePoolLayer(l1a, ds=2, axis=2) # abusing the feature pool layer as a regular 1D max pooling layer
 
 l2a = nn.layers.Conv1DLayer(l1, num_filters=32, filter_length=3, convolution=conv.conv1d_md)
