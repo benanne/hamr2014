@@ -274,7 +274,8 @@ for k, (chunk_data, chunk_labels) in enumerate(train_gen):
         losses_eval = []
         preds_eval = []
         for b in xrange(num_batches_eval):
-            loss_eval, acc_eval = iter_eval(b)
+            # loss_eval, acc_eval = iter_eval(b)
+            loss_eval = iter_eval(b)
             preds_eval.append(pred_eval(b))
             if np.isnan(loss_eval):
                 raise RuntimeError("loss_eval is NaN")
